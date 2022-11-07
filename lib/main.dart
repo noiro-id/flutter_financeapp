@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_financeapp/widgets/transaction_list.dart';
 import 'package:wakelock/wakelock.dart';
-import './transaction.dart';
+import './widgets/new_transaction.dart';
+import './models/transaction.dart';
 
 void main() => runApp(const MyApp());
 
@@ -11,15 +13,24 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     Wakelock.enable();
 
-    return MaterialApp(
-      title: 'Flutter App',
+    return const MaterialApp(
+      title: 'Flutter Finance App',
+      debugShowCheckedModeBanner: false,
+      // theme: ThemeData.from(colorScheme: const ColorScheme.dark()),
       home: MyHomePage(),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
-  final List<Transaction> transactions = [
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final List<Transaction> _userTransactions = [
     Transaction(
       id: 't1',
       title: 'New Shoes',
@@ -34,50 +45,72 @@ class MyHomePage extends StatelessWidget {
     ),
   ];
 
-  MyHomePage({super.key});
+  void _addNewTransaction(String txTitle, double txAmount) {
+    final newTx = Transaction(
+      title: txTitle,
+      amount: txAmount,
+      date: DateTime.now(),
+      id: DateTime.now().toString(),
+    );
+
+    setState(() {
+      _userTransactions.add(newTx);
+    });
+  }
+
+  void _startAddNewTransaction(BuildContext ctx) {
+    showModalBottomSheet(
+      context: ctx,
+      builder: (_) {
+        return GestureDetector(
+          onTap: () {},
+          // behavior: HitTestBehavior.opaque,
+          child: NewTransaction(_addNewTransaction),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Flutter App'),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Container(
-            width: double.infinity,
-            child: const Card(
-              color: Colors.blue,
-              elevation: 5,
-              child: Text('Chart!'),
+        title: const Text('Flutter Financial App'),
+        actions: [
+          IconButton(
+            onPressed: () => _startAddNewTransaction(context),
+            icon: const Icon(
+              Icons.add,
             ),
-          ),
-          Column(
-            children: transactions.map(
-              (tx) {
-                return Card(
-                  child: Row(
-                    children: <Widget>[
-                      SizedBox(
-                        child: Text(
-                          tx.amount.toString(),
-                        ),
-                      ),
-                      Column(
-                        children: <Widget>[
-                          Text(tx.title),
-                          Text(tx.date.toString()),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ).toList(),
           )
         ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          // mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(
+              width: double.infinity,
+              child: Card(
+                color: Colors.blue,
+                elevation: 3,
+                child: Text(
+                  'CHART!',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+            TransactionList(_userTransactions)
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () => _startAddNewTransaction(context),
       ),
     );
   }
