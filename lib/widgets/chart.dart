@@ -10,17 +10,17 @@ class Chart extends StatelessWidget {
     return List.generate(
       7,
       (index) {
-        var monday = DateTime.now();
-        while (monday.weekday != 1) {
-          monday = monday.subtract((const Duration(days: 1)));
-        }
+        // var monday = DateTime.now();
+        // while (monday.weekday != 1) {
+        //   monday = monday.subtract((const Duration(days: 1)));
+        // }
 
-        // final weekDay = DateTime.now().subtract(
-        //   Duration(days: index),
-        // );
-        final weekDay = monday.add(
+        final weekDay = DateTime.now().subtract(
           Duration(days: index),
         );
+        // final weekDay = monday.add(
+        //   Duration(days: index),
+        // );
         var totalSum = 0.0;
 
         for (var i = 0; i < recentTransactions.length; i++) {
@@ -36,7 +36,7 @@ class Chart extends StatelessWidget {
           'amount': totalSum
         };
       },
-    );
+    ).reversed.toList();
   }
 
   double get totalSpending {
